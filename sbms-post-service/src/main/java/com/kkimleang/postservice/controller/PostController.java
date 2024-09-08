@@ -2,6 +2,7 @@ package com.kkimleang.postservice.controller;
 
 import com.kkimleang.postservice.annotation.CurrentUser;
 import com.kkimleang.postservice.dto.PostRequest;
+import com.kkimleang.postservice.dto.PostResponse;
 import com.kkimleang.postservice.dto.UserResponse;
 import com.kkimleang.postservice.model.Post;
 import com.kkimleang.postservice.service.PostService;
@@ -28,7 +29,7 @@ public class PostController {
 
     @PreAuthorize("hasAuthority('READ')")
     @GetMapping
-    public List<Post> getPosts(@CurrentUser UserResponse user) {
+    public List<PostResponse> getPosts(@CurrentUser UserResponse user) {
         return postService.getAllPostsFromUser(user);
     }
 

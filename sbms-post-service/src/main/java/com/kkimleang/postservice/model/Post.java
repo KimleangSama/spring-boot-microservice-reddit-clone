@@ -16,7 +16,13 @@ public class Post {
     private Long id;
 
     private String title;
-    private String content;
+    private String url;
+    private String description;
+    private Integer voteCount = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subreddit_id", referencedColumnName = "id")
+    private Subreddit subreddit;
 
     private Long userId;
 }

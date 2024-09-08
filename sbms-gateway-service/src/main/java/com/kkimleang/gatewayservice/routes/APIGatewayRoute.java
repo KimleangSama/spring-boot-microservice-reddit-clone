@@ -7,6 +7,7 @@ import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctio
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.servlet.function.RequestPredicates;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
@@ -15,6 +16,7 @@ import static org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFi
 
 @RequiredArgsConstructor
 @Configuration
+@CrossOrigin(origins = "*")
 public class APIGatewayRoute {
     private final JwtTokenFilter jwtTokenFilter;
 
