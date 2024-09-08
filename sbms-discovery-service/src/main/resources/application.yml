@@ -1,0 +1,7 @@
+server:
+  port: 8761
+spring:
+  application:
+    name: sbms-discovery-service
+  config:
+    import: optional:configserver:http://localhost:9999

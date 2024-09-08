@@ -1,0 +1,91 @@
+server:
+  port: 8888
+
+springdoc:
+  swagger-ui:
+    url: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+spring:
+  application:
+    name: sbms-oauth2-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/oauth2_service
+    username: postgres
+    password: postgres
+    hikari:
+      schema: public
+  jpa:
+    open-in-view: false
+    defer-datasource-initialization: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+    properties:
+      '[hibernate.format_sql]': false
+      '[hibernate.generate_statistics]': false
+      '[persistence.schema-generation.scripts.create-target]': create.sql
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 659363140485-23or6dp1qinlj1qaaf0o9quug7lmsm8s.apps.googleusercontent.com
+            clientSecret: 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
+            redirectUri: "${BASEURL:http://localhost:8080}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+          facebook:
+            clientId: 1315782916064715
+            clientSecret: 496ff3424a02c5db1f1fcd5ada5b2203
+            redirectUri: "${BASEURL:http://localhost:8080}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - public_profile
+          github:
+            clientId: Ov23li89TClbZqLNZQv0
+            clientSecret: 19c76787e56e9984b5b1ec1b89f08ba9c66aa867
+            redirectUri: "${BASEURL:http://localhost:8080}/oauth2/callback/{registrationId}"
+            scope:
+              - user:email
+              - read:user
+        provider:
+          facebook:
+            authorizationUri: https://www.facebook.com/v3.0/dialog/oauth
+            tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
+            userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
+
+  config:
+    import: optional:configserver:http://localhost:9999
+
+rsa:
+  private-key:
+    classpath:certs/private.pem
+  public-key:
+    classpath:certs/public.pem
+
+token:
+  domain: http://localhost:3000
+  accessTokenExpiresHours: 336
+  refreshTokenExpiresHours: 720
+  issuer: jwt_security
+
+cors:
+  allowedOrigins: http://localhost:3000, http://localhost:8080
+
+oauth:
+  # After successfully authenticating with the OAuth2 Provider,
+  # we'll be generating an auth token for the user and sending the token to the
+  # redirectUri mentioned by the client in the /oauth2/authorize request.
+  # We're not using cookies because they won't work well in mobile clients.
+  authorizedRedirectUris:
+    - http://localhost:3000/oauth2/redirect
