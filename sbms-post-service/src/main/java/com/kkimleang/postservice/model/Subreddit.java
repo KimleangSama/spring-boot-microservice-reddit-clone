@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.List;
-
-import static jakarta.persistence.FetchType.LAZY;
 
 @Getter
 @Setter

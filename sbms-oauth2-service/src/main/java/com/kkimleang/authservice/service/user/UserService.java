@@ -71,7 +71,12 @@ public class UserService {
         User user = findByEmail(loginRequest.getEmail());
         this.revokeAllUserTokens(user);
         this.saveUserToken(user, accessToken);
-        return new AuthResponse(accessToken, refreshToken);
+        return new AuthResponse(
+                accessToken,
+                refreshToken,
+                user.getUsername(),
+                tokenProvider.getExpirationDateFromToken(accessToken)
+        );
     }
 
     public void saveUserToken(User user, String jwtToken) {
@@ -114,7 +119,12 @@ public class UserService {
                 var accessToken = tokenProvider.createAccessToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                var authResponse = new AuthResponse(accessToken, refreshToken);
+                var authResponse = new AuthResponse(
+                        accessToken,
+                        refreshToken,
+                        user.getUsername(),
+                        tokenProvider.getExpirationDateFromToken(accessToken)
+                );
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }

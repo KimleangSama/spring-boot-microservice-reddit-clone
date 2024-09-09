@@ -26,9 +26,10 @@ management:
 # Use Eureka Server
 service:
   auth:
-    url: SBMS-OAUTH2-SERVICE
-  post:
-    url: SBMS-POST-SERVICE
+    url: lb://SBMS-OAUTH2-SERVICE
+  post_subreddit:
+    url: lb://SBMS-POST-SERVICE
+
 
 cors:
   allowedOrigins: http://localhost:4200, http://localhost:8080

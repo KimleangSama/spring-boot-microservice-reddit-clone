@@ -25,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
+    private final CORSProperties corsProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,10 +47,10 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedHeaders(List.of("Authorization"));
-//        for(String corsProperty : corsProperties.getAllowedOrigins()) {
-//            configuration.addAllowedOrigin(corsProperty);
-//        }
-        configuration.addAllowedOrigin("*");
+        for(String corsProperty : corsProperties.getAllowedOrigins()) {
+            configuration.addAllowedOrigin(corsProperty);
+        }
+//        configuration.addAllowedOrigin("*");
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Requestor-Type", "Content-Type", "Access-Control-Allow-Headers", "Access-Control-Allow-Origin"));
         configuration.setExposedHeaders(Arrays.asList("X-Get-Header", "Access-Control-Allow-Methods", "Access-Control-Allow-Origin"));

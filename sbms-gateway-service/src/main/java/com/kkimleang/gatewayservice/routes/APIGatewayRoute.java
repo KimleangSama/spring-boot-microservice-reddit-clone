@@ -2,6 +2,7 @@ package com.kkimleang.gatewayservice.routes;
 
 import com.kkimleang.gatewayservice.filter.CustomUserHeaderGlobalFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -18,22 +19,22 @@ import java.util.function.Function;
 public class APIGatewayRoute {
     private final CustomUserHeaderGlobalFilter customGlobalFilter;
 
-//    @Value("${service.auth.url}")
-//    private String authServiceUrl;
-//    @Value("${service.post.url}")
-//    private String postServiceUrl;
+    @Value("${service.auth.url}")
+    private String authServiceUrl;
+    @Value("${service.post_subreddit.url}")
+    private String postSubredditServiceUrl;
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-service", r -> r.path("/api/auth/**")
                         .filters(brutalCorsFilter("/api/auth"))
-                        .uri("http://localhost:8888"))
-//                TODO: Change to LB Eureka Service
+                        .uri(authServiceUrl))
+                .route("post-subreddit-service", r -> r.path("/api/posts/**", "/api/subreddits/**")
+                        .filters(brutalCorsFilter("/api/posts_subreddits"))
+                        .uri(postSubredditServiceUrl))
                 .build();
     }
-
-
 
     Function<GatewayFilterSpec, UriSpec> brutalCorsFilter(final String serviceName) {
         return f -> f

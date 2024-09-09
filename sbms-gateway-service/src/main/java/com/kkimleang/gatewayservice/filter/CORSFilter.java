@@ -1,6 +1,7 @@
 package com.kkimleang.gatewayservice.filter;
 
 import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -13,13 +14,14 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
+import java.util.List;
 
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CORSFilter implements WebFilter {
-    private String[] coreAllowedHost = {"http://localhost:3000", "http://localhost:8080", "http://localhost:4200"};
+    @Value("${cors.allowedOrigins}")
+    private String coreAllowedHost;
 
     @NotNull
     @Override
@@ -28,14 +30,13 @@ public class CORSFilter implements WebFilter {
         final String origin = request.getHeaders().getOrigin();
         final HttpHeaders headers = exchange.getResponse().getHeaders();
 
-        final var allowedHosts = Arrays.asList(coreAllowedHost);
+        final List<String> allowedHosts = List.of(coreAllowedHost.split(","));
         if (origin != null && allowedHosts.contains(origin)) {
             headers.add("Access-Control-Allow-Origin", origin);
         }
         // Handle preflight requests (OPTIONS method)
         if (request.getMethod().equals(HttpMethod.OPTIONS)) {
             headers.add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
-            // TODO: Specific header later
             headers.add("Access-Control-Allow-Headers", "*");
             headers.add("Access-Control-Max-Age", "3600");
             exchange.getResponse().setStatusCode(HttpStatus.OK);

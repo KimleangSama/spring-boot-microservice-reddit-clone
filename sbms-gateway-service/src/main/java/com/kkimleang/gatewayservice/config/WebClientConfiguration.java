@@ -14,7 +14,6 @@ public class WebClientConfiguration {
                 .baseUrl("http://localhost:8888")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
-        // TODO: Change to Feign Client
     }
 }
 

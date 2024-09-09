@@ -2,6 +2,7 @@ package com.kkimleang.authservice.config.security;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 import com.kkimleang.authservice.config.properties.TokenProperties;
@@ -88,5 +89,9 @@ public class TokenProvider {
         } else {
             return false;
         }
+    }
+
+    public Instant getExpirationDateFromToken(String accessToken) {
+        return jwtDecoder.decode(accessToken).getExpiresAt();
     }
 }

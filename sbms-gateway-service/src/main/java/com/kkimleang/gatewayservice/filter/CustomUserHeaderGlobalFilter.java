@@ -39,8 +39,9 @@ public class CustomUserHeaderGlobalFilter implements GatewayFilter {
             }
             String token = authHeader.substring(7);
             Mono<UserResponse> userResponse = webClient
-                    .post()
-                    .uri("/api/token/verify?token=" + token).body(Mono.just(token), String.class)
+                    .get()
+                    .uri("/api/demo/user/me")
+                    .header("Authorization", "Bearer " + token)
                     .retrieve()
                     .bodyToMono(UserResponse.class);
             return userResponse.flatMap(user -> {
