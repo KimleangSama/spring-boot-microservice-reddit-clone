@@ -1,6 +1,6 @@
-package com.kkimleang.postservice.config;
+package com.kkimleang.commentservice.config;
 
-import com.kkimleang.postservice.filter.JwtTokenFilter;
+import com.kkimleang.commentservice.filter.JwtTokenFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

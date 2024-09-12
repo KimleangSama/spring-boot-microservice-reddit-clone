@@ -33,9 +33,25 @@ public class PostController {
         return postService.getAllPostsFromUser(user);
     }
 
+    @PreAuthorize("hasAuthority('READ')")
+    @GetMapping("/{id}/post")
+    public PostResponse getPostById(@PathVariable Long id) {
+        return postService.getPostById(id);
+    }
+
     @PreAuthorize("hasAuthority('REMOVE_ALL')")
     @DeleteMapping
     public boolean deleteAllPosts(@CurrentUser UserResponse user) {
         return postService.deleteAllPosts(user);
+    }
+
+    @PreAuthorize("hasAuthority('UPDATE')")
+    @PutMapping("/{id}")
+    public Post updatePost(
+            @CurrentUser UserResponse user,
+            @PathVariable Long id,
+            @RequestBody PostRequest post
+    ) {
+        return postService.updatePost(user, id, post);
     }
 }

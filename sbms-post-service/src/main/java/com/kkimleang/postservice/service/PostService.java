@@ -46,4 +46,26 @@ public class PostService {
             return false;
         }
     }
+
+    public Post updatePost(UserResponse user, Long id, PostRequest post) {
+        Post postToUpdate = postRepository.findById(id).orElse(null);
+        if (postToUpdate == null) {
+            return null;
+        }
+        if (!postToUpdate.getUserId().equals(user.getId())) {
+            return null;
+        }
+        postToUpdate.setTitle(post.getTitle());
+        postToUpdate.setDescription(post.getDescription());
+        postToUpdate.setUrl(post.getUrl());
+        return postRepository.save(postToUpdate);
+    }
+
+    public PostResponse getPostById(Long id) {
+        Post post = postRepository.findById(id).orElse(null);
+        if (post == null) {
+            return null;
+        }
+        return PostResponse.fromPost(post);
+    }
 }

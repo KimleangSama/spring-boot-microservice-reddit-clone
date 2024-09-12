@@ -1,0 +1,31 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: sbms-comment-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/comment_service
+    username: postgres
+    password: postgres
+    hikari:
+      schema: public
+  jpa:
+    open-in-view: false
+    defer-datasource-initialization: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+    properties:
+      '[hibernate.format_sql]': false
+      '[hibernate.generate_statistics]': false
+      '[persistence.schema-generation.scripts.create-target]': create.sql
+
+  config:
+    import: optional:configserver:http://localhost:9999
