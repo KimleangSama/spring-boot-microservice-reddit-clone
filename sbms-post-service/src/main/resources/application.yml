@@ -34,3 +34,7 @@ management:
   observations:
     key-values:
       application: post-service
+
+#logging:
+#  pattern:
+#    correlation: '[${spring.application.name:},%X{traceId:-},%X{spanId:-}]'

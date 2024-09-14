@@ -1,12 +1,6 @@
 server:
   port: 8888
 
-springdoc:
-  swagger-ui:
-    url: /swagger-ui.html
-  api-docs:
-    path: /api-docs
-
 spring:
   application:
     name: sbms-oauth2-service

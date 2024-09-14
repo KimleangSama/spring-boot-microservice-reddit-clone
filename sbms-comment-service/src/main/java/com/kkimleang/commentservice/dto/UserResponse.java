@@ -19,6 +19,7 @@ public class UserResponse implements UserDetails {
     private Long id;
     private String username;
     private String email;
+    private String token;
     private Set<RoleResponse> roles;
     private Set<PermissionResponse> permissions;
 

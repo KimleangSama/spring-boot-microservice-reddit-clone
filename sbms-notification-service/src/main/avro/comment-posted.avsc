@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "CommentPostedEvent",
+  "namespace": "com.kkimleang.commentservice.event",
+  "fields": [
+    { "name": "id", "type": "int" },
+    { "name": "postId", "type": "int" },
+    { "name": "userId", "type": "int" },
+    { "name": "email", "type": "string" },
+    { "name": "username", "type": "string" },
+    { "name": "content", "type": "string" },
+    { "name": "subreddit", "type": "string" }
+  ]
+}

@@ -21,7 +21,10 @@ public class CustomUserHeaderGlobalFilter implements GatewayFilter {
     }
 
     public static boolean isAnonymousPath(String requestPath) {
-        String[] freeURLS = {"/api/auth/**", "/api/token/**"};
+        String[] freeURLS = {
+                "/api/auth/**", "/api/token/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+                "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/**"
+        };
         for (String pattern : freeURLS) {
             if (pathMatcher.match(pattern, requestPath)) {
                 return true;

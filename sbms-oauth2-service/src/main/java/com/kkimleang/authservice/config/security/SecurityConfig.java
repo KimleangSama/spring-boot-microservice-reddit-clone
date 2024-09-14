@@ -65,6 +65,8 @@ public class SecurityConfig {
     private final String[] FREE_URLS = {
         "/api/auth/**", "/api/token/verify",
         "/oauth2/**", "/error/**",
+            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+            "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/prometheus", "/actuator/health/**"
     };
 
     @Bean

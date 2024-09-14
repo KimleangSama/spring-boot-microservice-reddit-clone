@@ -23,16 +23,27 @@ public class APIGatewayRoute {
     private String authServiceUrl;
     @Value("${service.post_subreddit.url}")
     private String postSubredditServiceUrl;
+    @Value("${service.comment.url}")
+    private String commentServiceUrl;
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
+                .route("auth-service-swagger", r -> r.path("/aggregate/SBMS-DISCOVERY-SERVICE/v3/api-docs")
+                        .filters(f -> f.setPath("/api-docs"))
+                        .uri(authServiceUrl))
+                .route("post-service-swagger", r -> r.path("/aggregate/SBMS-POST-SERVICE/v3/api-docs")
+                        .filters(f -> f.setPath("/api-docs"))
+                        .uri(postSubredditServiceUrl))
                 .route("auth-service", r -> r.path("/api/auth/**")
                         .filters(brutalCorsFilter("/api/auth"))
                         .uri(authServiceUrl))
                 .route("post-subreddit-service", r -> r.path("/api/posts/**", "/api/subreddits/**")
                         .filters(brutalCorsFilter("/api/posts_subreddits"))
                         .uri(postSubredditServiceUrl))
+                .route("comment-service", r -> r.path("/api/comments/**")
+                        .filters(brutalCorsFilter("/api/comments"))
+                        .uri(commentServiceUrl))
                 .build();
     }
 

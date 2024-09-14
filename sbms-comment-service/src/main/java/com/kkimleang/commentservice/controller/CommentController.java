@@ -1,6 +1,9 @@
 package com.kkimleang.commentservice.controller;
 
+import com.kkimleang.commentservice.annotation.CurrentUser;
+import com.kkimleang.commentservice.dto.CommentRequest;
 import com.kkimleang.commentservice.dto.CommentResponse;
+import com.kkimleang.commentservice.dto.UserResponse;
 import com.kkimleang.commentservice.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,5 +21,17 @@ public class CommentController {
     @GetMapping("/of-posts/{postId}")
     public List<CommentResponse> getCommentsByPostId(@PathVariable Long postId) {
         return commentService.getCommentsByPostId(postId);
+    }
+
+    @PreAuthorize("hasAuthority('WRITE')")
+    @PostMapping
+    public CommentResponse createComment(
+            @CurrentUser UserResponse user,
+            @RequestBody CommentRequest commentRequest
+    ) {
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        return commentService.createComment(user, commentRequest);
     }
 }

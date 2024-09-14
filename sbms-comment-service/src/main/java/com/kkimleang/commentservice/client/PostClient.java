@@ -5,8 +5,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "SBMS-POST-SERVICE")
+@FeignClient(
+        name = "SBMS-POST-SERVICE"
+)
 public interface PostClient {
     @GetMapping("/api/posts/{postId}/post")
-    PostResponse getPostById(@PathVariable String postId);
+    PostResponse getPostById(@PathVariable Long postId);
 }

@@ -1,6 +1,6 @@
 springdoc:
   swagger-ui:
-    url: /swagger-ui.html
+    path: /swagger-ui.html
   api-docs:
     path: /api-docs
 
@@ -17,13 +17,31 @@ spring:
   cloud:
     config:
       override-system-properties: false
+  jpa:
+    open-in-view: false
+    defer-datasource-initialization: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+    properties:
+      '[hibernate.format_sql]': false
+      '[hibernate.generate_statistics]': false
+      '[persistence.schema-generation.scripts.create-target]': create.sql
 
 # Use Eureka Server
 service:
   auth:
     url: lb://SBMS-OAUTH2-SERVICE
+    http: http://localhost:8888
   post_subreddit:
     url: lb://SBMS-POST-SERVICE
+  comment:
+    url: lb://SBMS-COMMENT-SERVICE
 
 
 cors:
@@ -53,3 +71,10 @@ management:
   tracing:
     sampling:
       probability: 1.0
+  endpoint:
+    health:
+      show:
+        details: always
+
+loki:
+  url: 'http://localhost:3100/loki/api/v1/push'

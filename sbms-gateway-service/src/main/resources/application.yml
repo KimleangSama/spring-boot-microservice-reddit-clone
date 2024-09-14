@@ -3,6 +3,13 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    urls:
+      - name: OAuth2 Service
+        url: /aggregate/SBMS-DISCOVERY-SERVICE/v3/api-docs
+      - name: Post Service
+        url: /aggregate/SBMS-POST-SERVICE/v3/api-docs
+#      - name: Comment Service
+#        url: /aggregate/comment-service/v3/api-docs
   api-docs:
     path: /api-docs
 spring:
@@ -10,3 +17,8 @@ spring:
     name: gateway-service
   config:
     import: optional:configserver:http://localhost:9999
+
+management:
+  observations:
+    key-values:
+      application: gateway-server
