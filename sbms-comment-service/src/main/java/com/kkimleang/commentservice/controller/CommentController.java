@@ -23,6 +23,29 @@ public class CommentController {
         return commentService.getCommentsByPostId(postId);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/of-users")
+    public List<CommentResponse> getCommentsByUserId(@CurrentUser UserResponse user) {
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        Long userId = user.getId();
+        return commentService.getCommentsByUserId(userId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/of-posts/{postId}/of-users")
+    public List<CommentResponse> getCommentsByPostIdAndUserId(
+            @PathVariable Long postId,
+            @CurrentUser UserResponse user
+    ) {
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        Long userId = user.getId();
+        return commentService.getCommentsByPostIdAndUserId(postId, userId);
+    }
+
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping
     public CommentResponse createComment(

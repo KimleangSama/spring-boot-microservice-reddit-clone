@@ -5,11 +5,11 @@ springdoc:
     path: /swagger-ui.html
     urls:
       - name: OAuth2 Service
-        url: /aggregate/SBMS-DISCOVERY-SERVICE/v3/api-docs
+        url: /aggregate/SBMS-OAUTH2-SERVICE/v3/api-docs
       - name: Post Service
         url: /aggregate/SBMS-POST-SERVICE/v3/api-docs
-#      - name: Comment Service
-#        url: /aggregate/comment-service/v3/api-docs
+      - name: Comment Service
+        url: /aggregate/SBMS-COMMENT-SERVICE/v3/api-docs
   api-docs:
     path: /api-docs
 spring:

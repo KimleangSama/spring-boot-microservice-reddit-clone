@@ -56,4 +56,14 @@ public class CommentService {
             throw new RuntimeException("Failed to create comment: " + e.getMessage());
         }
     }
+
+    public List<CommentResponse> getCommentsByUserId(Long userId) {
+        List<Comment> comments = commentRepository.findCommentsByUserId(userId);
+        return CommentResponse.from(comments);
+    }
+
+    public List<CommentResponse> getCommentsByPostIdAndUserId(Long postId, Long userId) {
+        List<Comment> comments = commentRepository.findCommentsByPostIdAndUserId(postId, userId);
+        return CommentResponse.from(comments);
+    }
 }

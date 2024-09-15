@@ -27,6 +27,10 @@ public class SecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
     private final CORSProperties corsProperties;
 
+    private final String[] freeURLs = {
+            "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/prometheus", "/actuator/health/**"
+    };
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -37,7 +41,10 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize ->
-                        authorize.anyRequest().authenticated()
+                        authorize.requestMatchers(freeURLs)
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .getOrBuild();
