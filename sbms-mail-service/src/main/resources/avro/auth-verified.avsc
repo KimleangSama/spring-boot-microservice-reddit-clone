@@ -1,0 +1,10 @@
+{
+  "type": "record",
+  "name": "AuthVerifiedEvent",
+  "namespace": "com.kkimleang.authservice.event",
+  "fields": [
+    { "name": "email", "type": "string" },
+    { "name": "username", "type": "string" },
+    { "name": "verification_code", "type": "string"}
+  ]
+}

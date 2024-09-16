@@ -27,6 +27,18 @@ spring:
       '[hibernate.generate_statistics]': false
       '[persistence.schema-generation.scripts.create-target]': create.sql
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      default-topic: auth-verified
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        schema:
+          registry:
+            url: http://127.0.0.1:8085
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+
   security:
     oauth2:
       client:

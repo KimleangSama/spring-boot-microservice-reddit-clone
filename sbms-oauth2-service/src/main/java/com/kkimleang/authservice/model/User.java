@@ -34,6 +34,12 @@ public class User {
     @Column(name = "is_enabled")
     private Boolean isEnabled;
 
+    @Column(name = "is_verified")
+    private Boolean isVerified;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;

@@ -6,18 +6,21 @@ import com.kkimleang.authservice.dto.AuthResponse;
 import com.kkimleang.authservice.dto.LoginRequest;
 import com.kkimleang.authservice.dto.SignUpRequest;
 import com.kkimleang.authservice.enumeration.AuthProvider;
+import com.kkimleang.authservice.event.AuthVerifiedEvent;
 import com.kkimleang.authservice.exception.ResourceNotFoundException;
 import com.kkimleang.authservice.model.Role;
 import com.kkimleang.authservice.model.Token;
 import com.kkimleang.authservice.model.User;
 import com.kkimleang.authservice.repository.TokenRepository;
 import com.kkimleang.authservice.repository.UserRepository;
+import com.kkimleang.authservice.util.RandomString;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,6 +39,7 @@ public class UserService {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final KafkaTemplate<String, AuthVerifiedEvent> kafkaTemplate;
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -54,7 +58,19 @@ public class UserService {
         Role userRole = roleService.findByName("ROLE_USER");
         user.getRoles().add(userRole);
         user.setProvider(AuthProvider.local);
+        user.setIsEnabled(true);
+        user.setIsVerified(false);
+        String randomCode = RandomString.make(24);
+        user.setVerificationCode(randomCode);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        AuthVerifiedEvent verified = new AuthVerifiedEvent(
+                user.getEmail(),
+                user.getUsername(),
+                user.getVerificationCode()
+        );
+        kafkaTemplate.send("auth-verified", verified);
+
         return userRepository.save(user);
     }
 
@@ -135,5 +151,15 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Token", "token", token));
         User user = findByEmail(tokenProvider.getUserEmailFromToken(token));
         return tokenProvider.isTokenValid(token, user);
+    }
+
+    public boolean verifyUser(String verificationCode) {
+        User user = userRepository.findByVerificationCode(verificationCode);
+        if (user.getVerificationCode().equals(verificationCode)) {
+            user.setIsVerified(true);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 }

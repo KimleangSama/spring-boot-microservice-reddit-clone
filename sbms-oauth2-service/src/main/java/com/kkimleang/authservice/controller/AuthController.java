@@ -16,10 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -58,6 +55,22 @@ public class AuthController {
                     .body(new ApiResponse(true, "User registered successfully."));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ApiResponse(false, "User registered unsuccessfully." + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<ApiResponse> verifyUser(
+            @RequestParam("code") String verificationCode
+    ) {
+        try {
+            boolean success = userService.verifyUser(verificationCode);
+            if (success) {
+                return ResponseEntity.ok(new ApiResponse(true, "User verified successfully."));
+            } else {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "User verified unsuccessfully."));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User verified unsuccessfully." + e.getMessage()));
         }
     }
 
