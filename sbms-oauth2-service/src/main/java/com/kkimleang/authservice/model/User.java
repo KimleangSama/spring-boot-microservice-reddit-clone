@@ -31,6 +31,9 @@ public class User {
     @Column(name = "provider_id")
     private String providerId;
 
+    @Column(name = "is_enabled")
+    private Boolean isEnabled;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;

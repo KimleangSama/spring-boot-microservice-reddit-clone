@@ -1,5 +1,6 @@
 package com.kkimleang.authservice.service.user;
 
+import com.kkimleang.authservice.model.Token;
 import com.kkimleang.authservice.model.User;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -72,14 +73,10 @@ public class CustomUserDetails implements OAuth2User, UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getIsEnabled();
     }
 
     public String getEmail() {
         return user.getEmail();
-    }
-
-    public Long getId() {
-        return user.getId();
     }
 }

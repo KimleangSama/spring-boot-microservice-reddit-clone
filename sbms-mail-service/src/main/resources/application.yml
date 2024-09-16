@@ -1,0 +1,28 @@
+server:
+  port: 9996
+
+spring:
+  application:
+    name: sbms-mail-service
+  config:
+    import: optional:configserver:http://localhost:9999
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: mail-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        schema:
+          registry:
+            url: http://127.0.0.1:8085
+        specific:
+          avro:
+            reader: true
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: bad8db8d790dea
+    password: f4e9e1910e1b56
