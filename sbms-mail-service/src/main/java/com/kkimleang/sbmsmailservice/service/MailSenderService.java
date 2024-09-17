@@ -1,6 +1,9 @@
 package com.kkimleang.sbmsmailservice.service;
 
+import com.kkimleang.authservice.event.AuthVerifiedEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,11 +13,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MailSenderService {
+    @Value("${service.gateway.http}")
+    private String gatewayUrl;
+
     private final JavaMailSender javaMailSender;
 
     @KafkaListener(topics = "auth-verified")
-    public void listen(com.kkimleang.authservice.event.AuthVerifiedEvent authVerifiedEvent) {
+    public void listen(AuthVerifiedEvent authVerifiedEvent) {
         MimeMessagePreparator messagePreparator = mimeMessage -> {
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
             messageHelper.setFrom("springshop@email.com");
@@ -30,14 +37,14 @@ public class MailSenderService {
         }
     }
 
-    private static String getContentString(com.kkimleang.authservice.event.AuthVerifiedEvent authVerifiedEvent) {
+    private String getContentString(AuthVerifiedEvent authVerifiedEvent) {
         String content = "Dear [[username]],<br>"
                 + "Please click the link below to verify your registration:<br>"
                 + "<h3><a href=\"[[URL]]\" target=\"_self\">VERIFY</a></h3>"
-                + "Thank you,<br>"
-                + "Your company name.";
+                + "Best regards,<br>"
+                + "SBMS Reddit Clone.";
         content = content.replace("[[username]]", authVerifiedEvent.getUsername());
-        content = content.replace("[[URL]]", "http://localhost:8080/api/auth/verify?code=" + authVerifiedEvent.getVerificationCode());
+        content = content.replace("[[URL]]", gatewayUrl + "/api/auth/verify?code=" + authVerifiedEvent.getVerificationCode());
         return content;
     }
 }

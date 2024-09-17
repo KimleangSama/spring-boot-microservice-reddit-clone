@@ -26,3 +26,8 @@ spring:
     port: 2525
     username: bad8db8d790dea
     password: f4e9e1910e1b56
+
+management:
+  observations:
+    key-values:
+      application: mail-service
