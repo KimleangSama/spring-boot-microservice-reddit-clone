@@ -66,4 +66,26 @@ public class CommentService {
         List<Comment> comments = commentRepository.findCommentsByPostIdAndUserId(postId, userId);
         return CommentResponse.from(comments);
     }
+
+    public CommentResponse updateComment(UserResponse user, Long commentId, CommentRequest commentRequest) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        if (!comment.getUserId().equals(user.getId())) {
+            throw new RuntimeException("You are not allowed to update this comment");
+        }
+        comment.setContent(commentRequest.getContent());
+        comment.setUpdatedAt(Instant.now());
+        comment = commentRepository.save(comment);
+        return CommentResponse.from(comment);
+    }
+
+    public boolean deleteComment(UserResponse user, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+        if (!comment.getUserId().equals(user.getId())) {
+            throw new RuntimeException("You are not allowed to delete this comment");
+        }
+        commentRepository.delete(comment);
+        return true;
+    }
 }

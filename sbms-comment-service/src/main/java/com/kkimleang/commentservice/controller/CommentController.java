@@ -3,6 +3,7 @@ package com.kkimleang.commentservice.controller;
 import com.kkimleang.commentservice.annotation.CurrentUser;
 import com.kkimleang.commentservice.dto.CommentRequest;
 import com.kkimleang.commentservice.dto.CommentResponse;
+import com.kkimleang.commentservice.dto.ResponseEntity;
 import com.kkimleang.commentservice.dto.UserResponse;
 import com.kkimleang.commentservice.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -48,13 +49,43 @@ public class CommentController {
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping
-    public CommentResponse createComment(
+    public ResponseEntity<CommentResponse> createComment(
             @CurrentUser UserResponse user,
             @RequestBody CommentRequest commentRequest
     ) {
         if (user == null) {
             throw new RuntimeException("User not found");
         }
-        return commentService.createComment(user, commentRequest);
+        try {
+            CommentResponse response = commentService.createComment(user, commentRequest);
+            return new ResponseEntity<>(200, "Comment created successfully", response);
+        } catch (Exception e) {
+            return new ResponseEntity<>(500, "Failed to create comment: " + e.getMessage(), null);
+        }
+    }
+
+    @PreAuthorize("hasAuthority('WRITE')")
+    @PutMapping("/{commentId}")
+    public CommentResponse updateComment(
+            @CurrentUser UserResponse user,
+            @PathVariable Long commentId,
+            @RequestBody CommentRequest commentRequest
+    ) {
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        return commentService.updateComment(user, commentId, commentRequest);
+    }
+
+    @PreAuthorize("hasAuthority('WRITE')")
+    @DeleteMapping("/{commentId}")
+    public boolean deleteComment(
+            @CurrentUser UserResponse user,
+            @PathVariable Long commentId
+    ) {
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+        return commentService.deleteComment(user, commentId);
     }
 }
