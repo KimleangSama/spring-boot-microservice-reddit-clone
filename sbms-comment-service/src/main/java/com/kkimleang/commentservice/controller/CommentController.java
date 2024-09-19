@@ -3,9 +3,9 @@ package com.kkimleang.commentservice.controller;
 import com.kkimleang.commentservice.annotation.CurrentUser;
 import com.kkimleang.commentservice.dto.CommentRequest;
 import com.kkimleang.commentservice.dto.CommentResponse;
-import com.kkimleang.commentservice.dto.ResponseEntity;
 import com.kkimleang.commentservice.dto.UserResponse;
 import com.kkimleang.commentservice.service.CommentService;
+import com.kkimleang.commoncore.payload.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +49,7 @@ public class CommentController {
 
     @PreAuthorize("hasAuthority('WRITE')")
     @PostMapping
-    public ResponseEntity<CommentResponse> createComment(
+    public Response<CommentResponse> createComment(
             @CurrentUser UserResponse user,
             @RequestBody CommentRequest commentRequest
     ) {
@@ -58,9 +58,10 @@ public class CommentController {
         }
         try {
             CommentResponse response = commentService.createComment(user, commentRequest);
-            return new ResponseEntity<>(200, "Comment created successfully", response);
+            return Response.<CommentResponse>ok().setPayload(response);
         } catch (Exception e) {
-            return new ResponseEntity<>(500, "Failed to create comment: " + e.getMessage(), null);
+            return Response.<CommentResponse>exception()
+                    .setErrors(e.getMessage());
         }
     }
 

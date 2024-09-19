@@ -37,14 +37,14 @@ spring:
 service:
   auth:
     url: lb://SBMS-OAUTH2-SERVICE
-    http: http://localhost:8888
+    http: ${AUTH_SERVER_ENDPOINT:http://localhost:8888}
   post_subreddit:
     url: lb://SBMS-POST-SERVICE
   comment:
     url: lb://SBMS-COMMENT-SERVICE
   gateway:
     url: lb://SBMS-GATEWAY-SERVICE
-    http: http://localhost:8080
+    http: ${GATEWAY_SERVER_ENDPOINT:http://localhost:8080}
 
 
 cors:

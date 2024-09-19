@@ -150,6 +150,11 @@
             <artifactId>kafka</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.kkimleang</groupId>
+            <artifactId>common-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
