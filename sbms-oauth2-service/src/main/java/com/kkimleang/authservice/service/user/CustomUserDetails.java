@@ -73,7 +73,7 @@ public class CustomUserDetails implements OAuth2User, UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getIsEnabled();
+        return user.getIsEnabled() != null;
     }
 
     public String getEmail() {

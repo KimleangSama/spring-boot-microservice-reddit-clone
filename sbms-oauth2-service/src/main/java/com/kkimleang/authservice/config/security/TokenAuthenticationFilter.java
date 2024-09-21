@@ -6,6 +6,7 @@ import com.kkimleang.authservice.repository.TokenRepository;
 import com.kkimleang.authservice.service.user.CustomUserDetails;
 import com.kkimleang.authservice.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -24,13 +25,16 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private UserService userService;
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private RedisTemplate<String, String> redis;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String email = "";
         try {
             String jwt = getJwtFromRequest(request);
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                String email = tokenProvider.getUserEmailFromToken(jwt);
+                email = tokenProvider.getUserEmailFromToken(jwt);
                 User userDetails = userService.findByEmail(email);
                 var isTokenValid = tokenRepository.findByToken(jwt)
                         .map(t -> !t.isExpired() && !t.isRevoked())
@@ -47,6 +51,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception ex) {
+            redis.delete("accessToken:" + email);
+            redis.delete("refreshToken:" + email);
             logger.error("Could not set user authentication in security context", ex);
         }
         filterChain.doFilter(request, response);

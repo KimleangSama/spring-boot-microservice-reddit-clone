@@ -8,6 +8,7 @@ import com.kkimleang.authservice.model.User;
 import com.kkimleang.authservice.service.user.CustomUserDetails;
 import com.kkimleang.authservice.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,15 +19,9 @@ import java.util.Set;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/demo")
-public class DemoController {
+@RequestMapping("/api/auth")
+public class UserController {
     private final UserService userService;
-
-    @GetMapping
-    @PreAuthorize("hasAuthority('READ')")
-    public String demo() {
-        return "Hello World!";
-    }
 
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")

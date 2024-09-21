@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -17,4 +19,5 @@ public class SignUpRequest {
     private String email;
     @NotBlank
     private String password;
+    private List<String> roles;
 }

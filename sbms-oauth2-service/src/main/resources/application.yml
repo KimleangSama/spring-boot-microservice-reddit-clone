@@ -27,6 +27,11 @@ spring:
       '[hibernate.generate_statistics]': false
       '[persistence.schema-generation.scripts.create-target]': create.sql
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   kafka:
     bootstrap-servers: localhost:9092
     template:

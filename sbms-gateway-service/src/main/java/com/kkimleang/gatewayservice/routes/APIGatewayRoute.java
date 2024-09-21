@@ -1,8 +1,10 @@
 package com.kkimleang.gatewayservice.routes;
 
+import com.kkimleang.gatewayservice.config.RateLimiterConfig;
 import com.kkimleang.gatewayservice.filter.CustomUserHeaderGlobalFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -10,6 +12,7 @@ import org.springframework.cloud.gateway.route.builder.UriSpec;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
@@ -18,6 +21,7 @@ import java.util.function.Function;
 @CrossOrigin(origins = "*")
 public class APIGatewayRoute {
     private final CustomUserHeaderGlobalFilter customGlobalFilter;
+    private final RateLimiterConfig rateLimiterConfig;
 
     @Value("${service.auth.url}")
     private String authServiceUrl;
@@ -52,6 +56,10 @@ public class APIGatewayRoute {
 
     Function<GatewayFilterSpec, UriSpec> brutalCorsFilter(final String serviceName) {
         return f -> f
+                .requestRateLimiter(config -> {
+                    config.setRateLimiter(redisRateLimiter());
+                    config.setKeyResolver(rateLimiterConfig.ipKeyResolver());
+                })
                 .filter(customGlobalFilter)
                 .rewritePath("/" + serviceName + "/(?<segment>.*)", "/${segment}")
                 .setResponseHeader("Access-Control-Allow-Origin", "*")
@@ -59,4 +67,9 @@ public class APIGatewayRoute {
                 .setResponseHeader("Access-Control-Expose-Headers", "*");
     }
 
+    // RedisRateLimiter bean configuration
+    @Bean
+    public RedisRateLimiter redisRateLimiter() {
+        return new RedisRateLimiter(10, 20); // 10 requests per second, burst capacity of 20
+    }
 }

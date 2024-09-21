@@ -19,6 +19,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final KafkaTemplate<String, AuthVerifiedEvent> kafkaTemplate;
+    private final RedisTemplate<String, String> redis;
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -55,8 +59,22 @@ public class UserService {
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(signUpRequest.getPassword());
-        Role userRole = roleService.findByName("ROLE_USER");
-        user.getRoles().add(userRole);
+
+        // Setup roles following the request, if empty role, set default role to ROLE_USER
+        if (signUpRequest.getRoles().isEmpty()) {
+            Role userRole = roleService.findByName("ROLE_USER");
+            user.getRoles().add(userRole);
+        } else {
+            signUpRequest.getRoles().forEach(role -> {
+                try {
+                    List<Role> roles = roleService.findByNames(List.of(role));
+                    user.getRoles().addAll(roles);
+                } catch (ResourceNotFoundException e) {
+                    System.out.println("Role not found: " + role + " with message: " + e.getMessage());
+                }
+            });
+        }
+
         user.setProvider(AuthProvider.local);
         user.setIsEnabled(true);
         user.setIsVerified(false);
@@ -75,6 +93,16 @@ public class UserService {
     }
 
     public AuthResponse authenticateUser(LoginRequest loginRequest) throws IOException {
+        String cachedAccessToken = redis.opsForValue().get("accessToken:" + loginRequest.getEmail());
+        String cachedRefreshToken = redis.opsForValue().get("refreshToken:" + loginRequest.getEmail());
+        if (cachedAccessToken != null && cachedRefreshToken != null && tokenProvider.validateToken(cachedAccessToken)) {
+            return new AuthResponse(
+                    cachedAccessToken,
+                    cachedRefreshToken,
+                    loginRequest.getEmail(),
+                    tokenProvider.getExpirationDateFromToken(cachedAccessToken)
+            );
+        }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -87,6 +115,8 @@ public class UserService {
         User user = findByEmail(loginRequest.getEmail());
         this.revokeAllUserTokens(user);
         this.saveUserToken(user, accessToken);
+        redis.opsForValue().set("accessToken:" + user.getEmail(), accessToken);
+        redis.opsForValue().set("refreshToken:" + user.getEmail(), refreshToken);
         return new AuthResponse(
                 accessToken,
                 refreshToken,

@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RoleService {
@@ -18,5 +20,10 @@ public class RoleService {
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Role", "name", name)
                 );
+    }
+
+    @Transactional
+    public List<Role> findByNames(List<String> names) {
+        return roleRepository.findByNameIn(names);
     }
 }

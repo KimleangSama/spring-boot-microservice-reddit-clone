@@ -17,6 +17,10 @@ spring:
     name: gateway-service
   config:
     import: optional:configserver:http://localhost:9999
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 management:
   observations:

@@ -3,6 +3,7 @@ package com.kkimleang.gatewayservice.filter;
 
 import com.kkimleang.gatewayservice.dto.UserResponse;
 import jakarta.ws.rs.ForbiddenException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,8 @@ import reactor.core.publisher.Mono;
 public class CustomUserHeaderGlobalFilter implements GatewayFilter {
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final WebClient webClient;
+    @Value("${service.auth.verify_user_uri}")
+    private String verifyUserUri;
 
     public CustomUserHeaderGlobalFilter(WebClient webClient) {
         this.webClient = webClient;
@@ -43,7 +46,7 @@ public class CustomUserHeaderGlobalFilter implements GatewayFilter {
             String token = authHeader.substring(7);
             Mono<UserResponse> userResponse = webClient
                     .get()
-                    .uri("/api/demo/user/me")
+                    .uri(verifyUserUri)
                     .header("Authorization", "Bearer " + token)
                     .retrieve()
                     .bodyToMono(UserResponse.class);

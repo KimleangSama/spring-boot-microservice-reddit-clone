@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "SBMS-OAUTH2-SERVICE")
 public interface UserAuthClient {
-    @GetMapping("/api/demo/user/me")
+    @GetMapping("${service.auth.verify_user_uri}")
     UserResponse getAuthenticatedUser(@RequestHeader("Authorization") String token);
 }

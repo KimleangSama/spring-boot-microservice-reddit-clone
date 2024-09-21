@@ -38,6 +38,7 @@ service:
   auth:
     url: lb://SBMS-OAUTH2-SERVICE
     http: ${AUTH_SERVER_ENDPOINT:http://localhost:8888}
+    verify_user_uri: /api/auth/user/me
   post_subreddit:
     url: lb://SBMS-POST-SERVICE
   comment:
@@ -45,6 +46,7 @@ service:
   gateway:
     url: lb://SBMS-GATEWAY-SERVICE
     http: ${GATEWAY_SERVER_ENDPOINT:http://localhost:8080}
+
 
 
 cors:
