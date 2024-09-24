@@ -3,9 +3,11 @@ package com.kkimleang.authservice.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Setter
 @Getter
-public class ApiResponse {
+public class ApiResponse implements Serializable {
     private boolean success;
     private String message;
 
@@ -13,6 +15,5 @@ public class ApiResponse {
         this.success = success;
         this.message = message;
     }
-
 }
 
