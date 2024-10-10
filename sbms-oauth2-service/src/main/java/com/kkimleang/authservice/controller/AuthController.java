@@ -54,7 +54,7 @@ public class AuthController {
             return ResponseEntity.created(location)
                     .body(new ApiResponse(true, "User registered successfully."));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User registered unsuccessfully." + e.getMessage()));
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "User registered unsuccessfully. " + e.getMessage()));
         }
     }
 

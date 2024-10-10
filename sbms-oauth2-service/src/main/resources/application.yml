@@ -32,17 +32,11 @@ spring:
       host: localhost
       port: 6379
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    template:
-      default-topic: auth-verified
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      properties:
-        schema:
-          registry:
-            url: http://127.0.0.1:8085
-      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: rabbitmq
+    password: rabbitmq
 
   security:
     oauth2:
@@ -100,3 +94,14 @@ oauth:
   # We're not using cookies because they won't work well in mobile clients.
   authorizedRedirectUris:
     - http://localhost:3000/oauth2/redirect
+
+rabbitmq:
+  queue:
+    email:
+      name: email_queue
+  exchange:
+    email:
+      name: email_exchange
+  binding:
+    email:
+      name: email_routing_key

@@ -7,19 +7,11 @@ spring:
   config:
     import: optional:configserver:http://localhost:9999
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: mail-service
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        schema:
-          registry:
-            url: http://127.0.0.1:8085
-        specific:
-          avro:
-            reader: true
-      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: rabbitmq
+    password: rabbitmq
 
   mail:
     host: sandbox.smtp.mailtrap.io
@@ -31,3 +23,14 @@ management:
   observations:
     key-values:
       application: mail-service
+
+rabbitmq:
+  queue:
+    email:
+      name: email_queue
+  exchange:
+    email:
+      name: email_exchange
+  binding:
+    email:
+      name: email_routing_key

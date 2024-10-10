@@ -6,11 +6,11 @@ import com.kkimleang.authservice.dto.AuthResponse;
 import com.kkimleang.authservice.dto.LoginRequest;
 import com.kkimleang.authservice.dto.SignUpRequest;
 import com.kkimleang.authservice.enumeration.AuthProvider;
-import com.kkimleang.authservice.event.AuthVerifiedEvent;
 import com.kkimleang.authservice.exception.ResourceNotFoundException;
 import com.kkimleang.authservice.model.Role;
 import com.kkimleang.authservice.model.Token;
 import com.kkimleang.authservice.model.User;
+import com.kkimleang.authservice.qpayload.RegisterVerifyEmailDetails;
 import com.kkimleang.authservice.repository.TokenRepository;
 import com.kkimleang.authservice.repository.UserRepository;
 import com.kkimleang.authservice.util.RandomString;
@@ -19,10 +19,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,8 +42,15 @@ public class UserService {
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final KafkaTemplate<String, AuthVerifiedEvent> kafkaTemplate;
     private final RedisTemplate<String, String> redis;
+
+    private final RabbitTemplate rabbitTemplate;
+
+    @Value("${rabbitmq.exchange.email.name}")
+    private String emailExchange;
+
+    @Value("${rabbitmq.binding.email.name}")
+    private String emailRoutingKey;
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -82,13 +89,12 @@ public class UserService {
         user.setVerificationCode(randomCode);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        AuthVerifiedEvent verified = new AuthVerifiedEvent(
+        RegisterVerifyEmailDetails verified = new RegisterVerifyEmailDetails(
                 user.getEmail(),
                 user.getUsername(),
                 user.getVerificationCode()
         );
-        kafkaTemplate.send("auth-verified", verified);
-
+        rabbitTemplate.convertAndSend(emailExchange, emailRoutingKey, verified);
         return userRepository.save(user);
     }
 
