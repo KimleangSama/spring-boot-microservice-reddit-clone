@@ -57,10 +57,12 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
     }
 
+    @Cacheable(value = "user", key = "#email")
     public boolean existsByEmail(@NotBlank @Email String email) {
         return userRepository.existsByEmail(email);
     }
 
+    @Cacheable(value = "user", key = "#signUpRequest.email")
     public User createUser(SignUpRequest signUpRequest) {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
@@ -98,7 +100,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public AuthResponse authenticateUser(LoginRequest loginRequest) throws IOException {
+    @Cacheable(value = "user", key = "#loginRequest.email")
+    public AuthResponse authenticateUser(LoginRequest loginRequest) {
         String cachedAccessToken = redis.opsForValue().get("accessToken:" + loginRequest.getEmail());
         String cachedRefreshToken = redis.opsForValue().get("refreshToken:" + loginRequest.getEmail());
         if (cachedAccessToken != null && cachedRefreshToken != null && tokenProvider.validateToken(cachedAccessToken)) {
