@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: postgres-oauth2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-oauth2
+  template:
+    metadata:
+      labels:
+          app: postgres-oauth2
+    spec:
+      containers:
+      - name: postgres-oauth2
+        image: postgres:latest
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-oauth2-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-oauth2-secret
+              key: POSTGRES_PASS
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-oauth2-secret
+              key: POSTGRES_DB
+        volumeMounts:
+        - name: postgres-vol
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-vol
+        persistentVolumeClaim:
+          claimName: postgres-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-oauth2
+spec:
+    selector:
+        app: postgres-oauth2
+    ports:
+      - protocol: TCP
+        port: 5432
+        targetPort: 5432
+    type: NodePort
