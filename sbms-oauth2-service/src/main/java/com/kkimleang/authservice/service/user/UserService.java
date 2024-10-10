@@ -21,8 +21,10 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -100,17 +103,21 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    @Cacheable(value = "user", key = "#loginRequest.email")
+//    @Cacheable(value = "authenticate_user", key = "#loginRequest.email")
+//    @Scheduled(fixedRateString = "2000")
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
         String cachedAccessToken = redis.opsForValue().get("accessToken:" + loginRequest.getEmail());
         String cachedRefreshToken = redis.opsForValue().get("refreshToken:" + loginRequest.getEmail());
         if (cachedAccessToken != null && cachedRefreshToken != null && tokenProvider.validateToken(cachedAccessToken)) {
-            return new AuthResponse(
-                    cachedAccessToken,
-                    cachedRefreshToken,
-                    loginRequest.getEmail(),
-                    tokenProvider.getExpirationDateFromToken(cachedAccessToken)
-            );
+            Optional<Token> token = tokenRepository.findByToken(cachedAccessToken);
+            if (token.isPresent() && !token.get().isExpired() && !token.get().isRevoked()) {
+                return new AuthResponse(
+                        cachedAccessToken,
+                        cachedRefreshToken,
+                        loginRequest.getEmail(),
+                        tokenProvider.getExpirationDateFromToken(cachedAccessToken)
+                );
+            }
         }
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

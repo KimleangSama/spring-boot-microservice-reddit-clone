@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @ToString
 @Entity
 @Table(name = "_permission", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"}, name = "unq_name")})
-public class Permission implements GrantedAuthority {
+public class Permission implements GrantedAuthority, Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -31,13 +31,12 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws Exception {
+    public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws Exception {
         try {
             AuthResponse authResponse = userService.authenticateUser(loginRequest);
             return ResponseEntity.ok(authResponse);
         } catch (BadCredentialsException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Bad credentials: There is no match with those information."));
+            throw new Exception("Incorrect username or password", e);
         }
     }
 
