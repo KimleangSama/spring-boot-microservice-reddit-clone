@@ -8,13 +8,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 @ToString
-public class CustomUserDetails implements OAuth2User, UserDetails {
+public class CustomUserDetails implements OAuth2User, UserDetails, Serializable {
     private final User user;
     private final Map<String, Object> attributes;
 

@@ -8,6 +8,7 @@ import com.kkimleang.authservice.model.User;
 import com.kkimleang.authservice.service.user.CustomUserDetails;
 import com.kkimleang.authservice.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

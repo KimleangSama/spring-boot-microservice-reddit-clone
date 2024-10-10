@@ -21,6 +21,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
@@ -55,6 +56,7 @@ public class UserService {
     @Value("${rabbitmq.binding.email.name}")
     private String emailRoutingKey;
 
+    @Cacheable(value = "user", key = "#email")
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
@@ -103,8 +105,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-//    @Cacheable(value = "authenticate_user", key = "#loginRequest.email")
-//    @Scheduled(fixedRateString = "2000")
+    @CacheEvict(value = "authenticate_user", key = "#loginRequest.email", allEntries = true)
+    @Scheduled(fixedRateString = "3000")
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
         String cachedAccessToken = redis.opsForValue().get("accessToken:" + loginRequest.getEmail());
         String cachedRefreshToken = redis.opsForValue().get("refreshToken:" + loginRequest.getEmail());

@@ -5,6 +5,7 @@ import com.kkimleang.authservice.model.Permission;
 import com.kkimleang.authservice.model.Role;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 
@@ -13,7 +14,7 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
+public class UserResponse implements Serializable {
     private Long id;
     private String username;
     private String email;
