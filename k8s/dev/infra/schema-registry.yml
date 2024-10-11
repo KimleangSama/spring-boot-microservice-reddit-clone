@@ -18,6 +18,7 @@ spec:
         image: confluentinc/cp-schema-registry:latest
         ports:
         - containerPort: 8081
+          name: schema-registry
         resources:
           requests:
             memory: "512Mi"
@@ -26,12 +27,21 @@ spec:
             memory: "1Gi"
             cpu: "1"
         env:
-        - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
-          value: "broker:9092"
         - name: SCHEMA_REGISTRY_HOST_NAME
-          value: "schema-registry"
+          valueFrom:
+            configMapKeyRef:
+              key: SCHEMA_REGISTRY_HOST_NAME
+              name: schema-registry-configmap
+        - name: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
+          valueFrom:
+            configMapKeyRef:
+              key: SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS
+              name: schema-registry-configmap
         - name: SCHEMA_REGISTRY_LISTENERS
-          value: "http://0.0.0.0:8081"
+          valueFrom:
+            configMapKeyRef:
+              key: SCHEMA_REGISTRY_LISTENERS
+              name: schema-registry-configmap
 ---
 apiVersion: v1
 kind: Service

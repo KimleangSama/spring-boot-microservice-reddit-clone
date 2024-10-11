@@ -20,6 +20,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: rabbitmq-pvc
 spec:
+  storageClassName: manual
+  volumeName: rabbitmq-pv
   accessModes:
     - ReadWriteOnce
   resources:
