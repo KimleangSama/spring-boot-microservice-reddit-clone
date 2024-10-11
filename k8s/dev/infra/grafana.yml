@@ -5,6 +5,7 @@ metadata:
     app: grafana
   name: grafana
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: grafana
@@ -44,16 +45,24 @@ spec:
               port: 3000
             timeoutSeconds: 1
           resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
             requests:
               cpu: 250m
               memory: 750Mi
           volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: grafana-pv
+            - name: grafana-pvc
+              mountPath: /var/lib/grafana
+            - name: grafana-configmap
+              mountPath: /etc/grafana/provisioning/datasources
       volumes:
-        - name: grafana-pv
+        - name: grafana-pvc
           persistentVolumeClaim:
             claimName: grafana-pvc
+        - name: grafana-configmap
+          configMap:
+            name: grafana-configmap
 ---
 apiVersion: v1
 kind: Service
@@ -63,7 +72,7 @@ spec:
   ports:
     - port: 3000
       protocol: TCP
-      targetPort: 3000
+      targetPort: http-grafana
   selector:
     app: grafana
   sessionAffinity: None

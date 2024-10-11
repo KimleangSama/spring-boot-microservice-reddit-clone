@@ -33,6 +33,13 @@ spec:
             secretKeyRef:
               name: postgres-oauth2-secret
               key: POSTGRES_DB
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         volumeMounts:
         - name: postgres-vol
           mountPath: /var/lib/postgresql/data
