@@ -48,7 +48,6 @@ service:
     http: ${GATEWAY_SERVER_ENDPOINT:http://localhost:8080}
 
 
-
 cors:
   allowedOrigins: http://localhost:4200, http://localhost:8080
 
