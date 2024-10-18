@@ -1,10 +1,10 @@
 pipeline{
 	agent any
 	environment {
-		PROJECT_NAME= "SBMS-Reddit-Clone"
-		SERVICE_NAME= "config-service"
-		REPO_NAME='sbms-config-service'
-		APP_ENV=${params.PARAMETER_NAME}
+		PROJECT_NAME = "SBMS-Reddit-Clone"
+		SERVICE_NAME = "config-service"
+		REPO_NAME = "sbms-config-service"
+		APP_ENV = "${params.APP_ENV}"
 	}
 	stages {
 		stage('Parameters'){
