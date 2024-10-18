@@ -4,7 +4,7 @@ pipeline{
 		PROJECT_NAME= "SBMS-Reddit-Clone"
 		SERVICE_NAME= "config-service"
 		REPO_NAME='sbms-config-service'
-		APP_ENV=env.APP_ENV
+		APP_ENV=${params.PARAMETER_NAME}
 	}
 	stages {
 		stage('Parameters'){
