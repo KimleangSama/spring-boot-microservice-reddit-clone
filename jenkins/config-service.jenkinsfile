@@ -1,0 +1,119 @@
+pipeline{
+	agent any
+	environment {
+		PROJECT_NAME= "SBMS-Reddit-Clone"
+		SERVICE_NAME= "config-service"
+		REPO_NAME='sbms-config-service'
+		APP_ENV=env.APP_ENV
+	}
+	stages {
+		stage('Parameters'){
+			steps{
+				script {
+					properties([
+						parameters([
+							[$class: 'ChoiceParameter',
+									choiceType: 'PT_SINGLE_SELECT',
+									description: '',
+									filterLength: 1,
+									filterable: true,
+									name: 'Branch',
+									script: [
+										$class: 'GroovyScript',
+										fallbackScript: [
+											classpath: [],
+											sandbox: false,
+											script:
+													"return ['Could not get The Branch Name']"
+										],
+										script: [ classpath: [], sandbox: false,
+                                            script: """
+                                                def gettags = ("git ls-remote -t -h git@gitlab.com:amk-bank/digital-platform/config-server.git").execute()
+                                                def branchList = gettags.text.readLines().collect {
+                                                    it.split()[1].replaceAll('refs/heads/', '').replaceAll('refs/tags/', '')
+                                                }
+                                                branchList.add(0, 'main:selected')
+                                                return branchList
+                                            """.stripIndent()
+										]
+									]
+							],
+							text(name: 'Release_Note', defaultValue: 'Add Some Release Note...', description: ''),
+						])
+					])
+				}
+			}
+		}
+		stage("Configure"){
+			steps{
+				script {
+					sh """
+						ansible-playbook \
+							ansible/configure.yml \
+							-i ansible/hosts \
+							-e Webex_Token="${Webex_Token}" \
+							-e Webex_RoomID="${Webex_RoomID}" \
+							-e workspace="${WORKSPACE}/config-service" \
+							-e app_env="${APP_ENV}" \
+							-e project_name="${PROJECT_NAME}" \
+							-e service_name="${SERVICE_NAME}" \
+							-e build_user="${BUILD_USER}" \
+							-e git_branch="${Branch}"
+					"""
+				}
+			}
+		}
+		stage("Build"){
+			steps{
+				script {
+					sh """
+						sudo alternatives --set java /usr/lib/jvm/java-21-openjdk-21.0.4.0.7-1.el9.x86_64/bin/java
+						ansible-playbook \
+							ansible/build.yml \
+							-i ansible/hosts \
+							-e version="${APP_ENV}-${BUILD_NUMBER}" \
+							-e app_env="${APP_ENV}" \
+							-e project_name="${PROJECT_NAME}" \
+							-e workspace="${WORKSPACE}/config-service" \
+							-e registry_name="${REPO_NAME}"
+					"""
+				}
+			}
+		}
+		stage("Deploy"){
+			steps{
+				script {
+					sh """
+						ansible-playbook \
+							ansible/deployment-k8s.yml \
+							-i ansible/hosts \
+							-e version="${APP_ENV}-${BUILD_NUMBER}" \
+							-e project_name=${PROJECT_NAME} \
+							-e service_name="${SERVICE_NAME}" \
+							-e app_env="${APP_ENV}" \
+							-e registry_name="${REPO_NAME}" \
+							-e kube_config_path="${KUBE_CONFIG}"
+					"""
+				}
+			}
+		}
+		stage('Clean Workspace'){
+			steps {
+				cleanWs()
+			}
+		}
+	}
+	post{
+		always{
+			script{
+				sh """
+					curl --location 'https://webexapis.com/v1/messages' \
+						 --header 'Authorization: ${Webex_Token}' \
+						 --form 'roomId=${Webex_RoomID}' \
+						 --form "html=Stage: Deploy ${PROJECT_NAME} on service ${SERVICE_NAME} <br> Status: ${currentBuild.currentResult} <br> Version: ${APP_ENV}-${BUILD_NUMBER} <br> Environment: k8s-${APP_ENV} <br>  Builder: ${BUILD_USER} <br> Release Note: <pre>${Release_Note}</pre>"
+				"""
+				cleanWs()
+			}
+		}
+	}
+}
