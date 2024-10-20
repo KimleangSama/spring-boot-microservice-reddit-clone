@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import com.kkimleang.authservice.config.properties.TokenProperties;
 import com.kkimleang.authservice.model.User;
 import com.kkimleang.authservice.service.user.CustomUserDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenProvider {
@@ -62,23 +64,33 @@ public class TokenProvider {
     }
 
     public String getUserEmailFromToken(String token) {
-        Jwt jwt = jwtDecoder.decode(token);
-        return jwt.getClaim(JwtUtils.EMAIL.getProperty());
+        try {
+            Jwt jwt = jwtDecoder.decode(token);
+            return jwt.getClaim(JwtUtils.EMAIL.getProperty());
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public boolean isTokenValid(String token, User user) {
         final String username = getUserEmailFromToken(token);
-        return (username.equals(user.getEmail())) && isTokenExpired(token);
+        return (username.equals(user.getEmail())) && isTokenNotExpired(token);
     }
 
-    public boolean isTokenExpired(String token) {
-        if (token == null) {
-            return true;
-        }
-        Instant exp = jwtDecoder.decode(token).getExpiresAt();
-        if (exp != null) {
-            return !exp.isBefore(Instant.now());
-        } else {
+    public boolean isTokenNotExpired(String token) {
+        try {
+            if (token == null) {
+                log.error("Token provided is null.");
+                return false;
+            }
+            Instant exp = jwtDecoder.decode(token).getExpiresAt();
+            if (exp != null) {
+                return !(exp.isBefore(Instant.now()));
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Error Token {}", e.getMessage());
             return false;
         }
     }

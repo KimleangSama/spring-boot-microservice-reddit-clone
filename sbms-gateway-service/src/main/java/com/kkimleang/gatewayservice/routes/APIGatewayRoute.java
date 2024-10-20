@@ -11,14 +11,11 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.gateway.route.builder.UriSpec;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
 @RequiredArgsConstructor
 @Configuration
-@CrossOrigin(origins = "*")
 public class APIGatewayRoute {
     private final CustomUserHeaderGlobalFilter customGlobalFilter;
     private final RateLimiterConfig rateLimiterConfig;
@@ -42,8 +39,12 @@ public class APIGatewayRoute {
                 .route("comment-service-swagger", r -> r.path("/aggregate/SBMS-COMMENT-SERVICE/v3/api-docs")
                         .filters(f -> f.setPath("/api-docs"))
                         .uri(commentServiceUrl))
+
                 .route("auth-service", r -> r.path("/api/auth/**")
                         .filters(brutalCorsFilter("/api/auth"))
+                        .uri(authServiceUrl))
+                .route("oauth2-service", r -> r.path("/oauth2/**")
+                        .filters(brutalCorsFilter("/oauth2"))
                         .uri(authServiceUrl))
                 .route("post-subreddit-service", r -> r.path("/api/posts/**", "/api/subreddits/**")
                         .filters(brutalCorsFilter("/api/posts_subreddits"))

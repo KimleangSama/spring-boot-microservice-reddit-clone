@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: sbms-oauth2-service
+  config:
+    import: optional:configserver:http://localhost:9999
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/oauth2_service
@@ -27,9 +29,6 @@ spring:
       '[hibernate.generate_statistics]': false
       '[persistence.schema-generation.scripts.create-target]': create.sql
 
-  config:
-    import: optional:configserver:http://localhost:9999
-
   data:
     redis:
       host: localhost
@@ -46,8 +45,8 @@ spring:
       client:
         registration:
           google:
-            clientId: 659363140485-23or6dp1qinlj1qaaf0o9quug7lmsm8s.apps.googleusercontent.com
-            clientSecret: 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
+            clientId: 363530177172-ho7j0rlr0sctj44c0pb2bgsno499rsnm.apps.googleusercontent.com
+            clientSecret: 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
             redirectUri: "${BASEURL:http://localhost:8080}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -61,7 +60,7 @@ spring:
               - public_profile
           github:
             clientId: Ov23li89TClbZqLNZQv0
-            clientSecret: 19c76787e56e9984b5b1ec1b89f08ba9c66aa867
+            clientSecret: 1cd74d0ba6eb903720a1f390d3055205316301c1
             redirectUri: "${BASEURL:http://localhost:8080}/oauth2/callback/{registrationId}"
             scope:
               - user:email
@@ -86,9 +85,6 @@ token:
   accessTokenExpiresHours: 336
   refreshTokenExpiresHours: 720
   issuer: jwt_security
-
-cors:
-  allowedOrigins: http://localhost:3000, http://localhost:8080
 
 oauth:
   # After successfully authenticating with the OAuth2 Provider,

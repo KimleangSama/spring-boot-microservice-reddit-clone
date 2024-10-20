@@ -32,7 +32,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String email;
         try {
             String jwt = getJwtFromRequest(request);
-            if (StringUtils.hasText(jwt) && tokenProvider.isTokenExpired(jwt)) {
+            if (StringUtils.hasText(jwt) && tokenProvider.isTokenNotExpired(jwt)) {
                 email = tokenProvider.getUserEmailFromToken(jwt);
                 User user = userService.findByEmail(email);
                 var isTokenValid = tokenRepository.findByToken(jwt)

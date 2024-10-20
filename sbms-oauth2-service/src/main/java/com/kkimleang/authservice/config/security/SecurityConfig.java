@@ -66,10 +66,18 @@ public class SecurityConfig {
     }
 
     private final String[] FREE_URLS = {
-        "/api/auth/**", "/api/token/verify",
-        "/oauth2/**", "/error/**",
-            "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
-            "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/prometheus", "/actuator/health/**"
+            "/api/auth/**",
+            "/api/token/verify",
+            "/oauth2/**",
+            "/error/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/api-docs/**",
+            "/aggregate/**",
+            "/actuator/prometheus",
+            "/actuator/health/**"
     };
 
     @Bean
@@ -99,7 +107,7 @@ public class SecurityConfig {
                         .authenticated())
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
-                        logout.logoutUrl("/api/v1/auth/logout")
+                        logout.logoutUrl("/api/auth/logout")
                                 .addLogoutHandler((request, response, authentication) -> {
                                     final String header = request.getHeader("Authorization");
                                     final String jwt;

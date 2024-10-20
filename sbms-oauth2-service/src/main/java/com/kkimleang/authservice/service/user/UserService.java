@@ -124,9 +124,6 @@ public class UserService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String accessToken = tokenProvider.createAccessToken(authentication);
             String refreshToken = tokenProvider.createRefreshToken(authentication);
-//            User user = userRepository.findByEmail(loginRequest.getEmail())
-//                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + loginRequest.getEmail()));
-
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
             if (user == null) {
@@ -141,7 +138,6 @@ public class UserService {
                     tokenProvider.getExpirationDateFromToken(accessToken)
             );
         } catch (Exception e) {
-            e.printStackTrace();
             String message = "We cannot authenticate user. Please check email and password.";
             log.error(message);
             throw new BadCredentialsException(message);

@@ -27,6 +27,7 @@ public class CustomUserHeaderGlobalFilter implements GatewayFilter {
         String[] freeURLS = {
                 "/api/auth/**",
                 "/api/token/**",
+                "/oauth2/**",
                 "/swagger-ui.html",
                 "/swagger-ui/**",
                 "/v3/api-docs/**",

@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import com.kkimleang.authservice.config.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.kkimleang.authservice.config.properties.OAuthProperties;
+import com.kkimleang.authservice.service.user.UserService;
 import com.kkimleang.authservice.util.TokenProvider;
 import com.kkimleang.authservice.exception.BadRequestException;
 import com.kkimleang.authservice.exception.ResourceNotFoundException;
@@ -63,10 +64,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
         String accessToken = tokenProvider.createAccessToken(authentication);
+        String refreshToken = tokenProvider.createRefreshToken(authentication);
         Optional<User> user = userRepository.findByEmail(authentication.getName());
         if (user.isEmpty()) {
             throw new ResourceNotFoundException("User", "email", authentication.getName());
         }
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(Math.toIntExact(user.get().getId()));
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
         Token token = Token.builder()
                 .user(user.get())
                 .token(accessToken)
@@ -76,7 +84,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .build();
         tokenRepository.save(token);
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", accessToken)
+                .queryParam("accessToken", accessToken)
+                .queryParam("refreshToken", refreshToken)
                 .build().toUriString();
     }
 

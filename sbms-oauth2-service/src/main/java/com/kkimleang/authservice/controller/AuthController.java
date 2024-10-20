@@ -37,7 +37,7 @@ public class AuthController {
                     .setPayload(null);
         } catch (BadCredentialsException e) {
             return Response.<AuthDto>wrongCredentials()
-                    .setErrors("Username or password is incorrect. " + e.getMessage())
+                    .setErrors(e.getMessage())
                     .setPayload(null);
         } catch (Exception e) {
             return Response.<AuthDto>exception()
