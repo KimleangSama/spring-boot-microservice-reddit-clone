@@ -1,4 +1,4 @@
-package com.kkimleang.authservice.dto;
+package com.kkimleang.authservice.dto.auth;
 
 import lombok.Getter;
 import lombok.Setter;

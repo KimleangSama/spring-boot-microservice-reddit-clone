@@ -1,4 +1,4 @@
-package com.kkimleang.authservice.dto;
+package com.kkimleang.authservice.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

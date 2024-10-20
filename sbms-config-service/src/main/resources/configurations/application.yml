@@ -20,13 +20,7 @@ spring:
   jpa:
     open-in-view: false
     defer-datasource-initialization: true
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     generate-ddl: true
-    hibernate:
-      ddl-auto: update
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: false
     properties:
       '[hibernate.format_sql]': false
@@ -82,3 +76,4 @@ management:
 
 loki:
   url: 'http://localhost:3100/loki/api/v1/push'
+  log-level: 'INFO'

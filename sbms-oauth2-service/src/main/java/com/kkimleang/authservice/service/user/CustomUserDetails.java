@@ -1,21 +1,24 @@
 package com.kkimleang.authservice.service.user;
 
-import com.kkimleang.authservice.model.Token;
 import com.kkimleang.authservice.model.User;
-import lombok.ToString;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-@ToString
 public class CustomUserDetails implements OAuth2User, UserDetails, Serializable {
+    @Serial
+    private static final long serialVersionUID = 5630699925975073133L;
+
+    @Getter
     private final User user;
     private final Map<String, Object> attributes;
 
@@ -24,7 +27,6 @@ public class CustomUserDetails implements OAuth2User, UserDetails, Serializable 
         this.attributes = attributes;
     }
 
-    // TODO: Change between username and email
     @Override
     public String getName() {
         return user.getUsername();

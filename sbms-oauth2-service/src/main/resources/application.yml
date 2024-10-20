@@ -12,7 +12,7 @@ spring:
     hikari:
       schema: public
   jpa:
-    open-in-view: false
+    open-in-view: true
     defer-datasource-initialization: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -26,6 +26,9 @@ spring:
       '[hibernate.format_sql]': false
       '[hibernate.generate_statistics]': false
       '[persistence.schema-generation.scripts.create-target]': create.sql
+
+  config:
+    import: optional:configserver:http://localhost:9999
 
   data:
     redis:
@@ -69,8 +72,8 @@ spring:
             tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
             userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
 
-  config:
-    import: optional:configserver:http://localhost:9999
+#  config:
+#    import: optional:configserver:http://localhost:9999
 
 rsa:
   private-key:

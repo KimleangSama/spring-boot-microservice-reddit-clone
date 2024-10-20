@@ -2,7 +2,7 @@ server:
   port: 8080
 springdoc:
   swagger-ui:
-    path: /swagger-ui.html
+#    path: /swagger-ui.html
     urls:
       - name: OAuth2 Service
         url: /aggregate/SBMS-OAUTH2-SERVICE/v3/api-docs
@@ -10,8 +10,8 @@ springdoc:
         url: /aggregate/SBMS-POST-SERVICE/v3/api-docs
       - name: Comment Service
         url: /aggregate/SBMS-COMMENT-SERVICE/v3/api-docs
-  api-docs:
-    path: /api-docs
+#  api-docs:
+#    path: /api-docs
 spring:
   application:
     name: gateway-service
@@ -26,3 +26,7 @@ management:
   observations:
     key-values:
       application: gateway-server
+
+loki:
+  url: 'http://localhost:3100/loki/api/v1/push'
+  log-level: 'INFO'

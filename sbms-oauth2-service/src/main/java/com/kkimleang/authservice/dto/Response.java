@@ -1,12 +1,16 @@
-package com.kkimleang.commoncore.payload;
+package com.kkimleang.authservice.dto;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.kkimleang.commoncore.util.DateUtils;
+import com.kkimleang.authservice.util.DateUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -14,22 +18,33 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Response<T> {
+public class Response<T> implements Serializable {
     private Status status;
+    private int statusCode;
     private T payload;
     private Object errors;
     private boolean success = false;
+    private Instant timestamp = Instant.now();
     private Object metadata;
 
     public static <T> Response<T> badRequest() {
         Response<T> response = new Response<>();
         response.setStatus(Status.BAD_REQUEST);
+        response.setStatusCode(400);
         return response;
     }
 
     public static <T> Response<T> ok() {
         Response<T> response = new Response<>();
         response.setStatus(Status.OK);
+        response.setStatusCode(200);
+        response.setSuccess(true);
+        return response;
+    }
+
+    public static <T> Response<T> created() {
+        Response<T> response = new Response<>();
+        response.setStatus(Status.CREATED);
         response.setSuccess(true);
         return response;
     }
@@ -37,12 +52,6 @@ public class Response<T> {
     public static <T> Response<T> unauthorized() {
         Response<T> response = new Response<>();
         response.setStatus(Status.UNAUTHORIZED);
-        return response;
-    }
-
-    public static <T> Response<T> validationException() {
-        Response<T> response = new Response<>();
-        response.setStatus(Status.VALIDATION_EXCEPTION);
         return response;
     }
 
@@ -97,7 +106,7 @@ public class Response<T> {
     }
 
     public enum Status {
-        GENERATION_NOT_AVAILABLE, OK, BAD_REQUEST, UNAUTHORIZED, VALIDATION_EXCEPTION, EXCEPTION, WRONG_CREDENTIALS, ACCESS_DENIED, NOT_FOUND, DUPLICATE_ENTITY
+        GENERATION_NOT_AVAILABLE, OK, BAD_REQUEST, UNAUTHORIZED, VALIDATION_EXCEPTION, EXCEPTION, WRONG_CREDENTIALS, ACCESS_DENIED, NOT_FOUND, CREATED, DUPLICATE_ENTITY
     }
 
     @Getter

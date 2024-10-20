@@ -1,4 +1,4 @@
-package com.kkimleang.authservice.config.security;
+package com.kkimleang.authservice.config.oauth2.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

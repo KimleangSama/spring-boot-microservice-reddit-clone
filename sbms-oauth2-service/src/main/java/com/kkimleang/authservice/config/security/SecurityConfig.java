@@ -4,9 +4,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.kkimleang.authservice.config.filter.TokenAuthenticationFilter;
 import com.kkimleang.authservice.config.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.kkimleang.authservice.config.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import com.kkimleang.authservice.config.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import com.kkimleang.authservice.config.oauth2.handler.RestAccessDeniedHandler;
+import com.kkimleang.authservice.config.oauth2.handler.RestAuthenticationEntryPoint;
 import com.kkimleang.authservice.config.oauth2.service.CustomOAuth2UserService;
 import com.kkimleang.authservice.config.properties.CORSProperties;
 import org.springframework.context.annotation.Bean;

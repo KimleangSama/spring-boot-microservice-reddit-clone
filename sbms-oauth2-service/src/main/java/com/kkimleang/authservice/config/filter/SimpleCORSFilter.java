@@ -1,4 +1,4 @@
-package com.kkimleang.authservice.config.security;
+package com.kkimleang.authservice.config.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletResponse;

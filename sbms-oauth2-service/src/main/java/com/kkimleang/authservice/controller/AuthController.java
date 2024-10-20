@@ -1,28 +1,24 @@
 package com.kkimleang.authservice.controller;
 
-import com.kkimleang.authservice.config.security.TokenProvider;
-import com.kkimleang.authservice.dto.ApiResponse;
-import com.kkimleang.authservice.dto.AuthResponse;
-import com.kkimleang.authservice.dto.LoginRequest;
-import com.kkimleang.authservice.dto.SignUpRequest;
+import com.kkimleang.authservice.dto.Response;
+import com.kkimleang.authservice.dto.auth.AuthDto;
+import com.kkimleang.authservice.dto.auth.LoginRequest;
+import com.kkimleang.authservice.dto.auth.SignUpRequest;
+import com.kkimleang.authservice.dto.user.UserDto;
 import com.kkimleang.authservice.model.User;
 import com.kkimleang.authservice.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
-import java.net.URI;
 
 @AllArgsConstructor
 @RestController
@@ -31,45 +27,65 @@ public class AuthController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws Exception {
+    public Response<AuthDto> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
-            AuthResponse authResponse = userService.authenticateUser(loginRequest);
-            return ResponseEntity.ok(authResponse);
+            AuthDto response = userService.authenticateUser(loginRequest);
+            return Response.<AuthDto>ok().setPayload(response);
+        } catch (UsernameNotFoundException e) {
+            return Response.<AuthDto>wrongCredentials()
+                    .setErrors("User with email " + loginRequest.getEmail() + " not found.")
+                    .setPayload(null);
         } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect username or password", e);
+            return Response.<AuthDto>wrongCredentials()
+                    .setErrors("Username or password is incorrect. " + e.getMessage())
+                    .setPayload(null);
+        } catch (Exception e) {
+            return Response.<AuthDto>exception()
+                    .setErrors("User authentication failed. " + e.getMessage())
+                    .setPayload(null);
         }
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public Response<UserDto> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
         try {
             if (userService.existsByEmail(signUpRequest.getEmail())) {
-                return ResponseEntity.badRequest().body(new ApiResponse(false, "Email address already in use."));
+                return Response.<UserDto>badRequest()
+                        .setErrors("Email is already taken!")
+                        .setPayload(null);
             }
-            User result = userService.createUser(signUpRequest);
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentContextPath().path("/user/me")
-                    .buildAndExpand(result.getId()).toUri();
-            return ResponseEntity.created(location)
-                    .body(new ApiResponse(true, "User registered successfully."));
+            User user = userService.createUser(signUpRequest);
+//            URI location = ServletUriComponentsBuilder
+//                    .fromCurrentContextPath().path("/user/me")
+//                    .buildAndExpand(result.getId()).toUri();
+//            return ResponseEntity.created(location)
+//                    .body(new ApiResponse(true, "User registered successfully."));
+            return Response.<UserDto>created().setPayload(UserDto.fromUser(user));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User registered unsuccessfully. " + e.getMessage()));
+            return Response.<UserDto>badRequest()
+                    .setErrors("User registration failed. " + e.getMessage())
+                    .setPayload(null);
         }
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<ApiResponse> verifyUser(
+    public Response<UserDto> verifyUser(
             @RequestParam("code") String verificationCode
     ) {
         try {
-            boolean success = userService.verifyUser(verificationCode);
-            if (success) {
-                return ResponseEntity.ok(new ApiResponse(true, "User verified successfully."));
+            User user = userService.verifyUser(verificationCode);
+            if (user != null) {
+                return Response.<UserDto>ok()
+                        .setPayload(UserDto.fromUser(user));
             } else {
-                return ResponseEntity.badRequest().body(new ApiResponse(false, "User verified unsuccessfully."));
+                return Response.<UserDto>badRequest()
+                        .setErrors("User verification failed.")
+                        .setPayload(null);
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, "User verified unsuccessfully." + e.getMessage()));
+            return Response.<UserDto>badRequest()
+                    .setErrors("User verification failed. " + e.getMessage())
+                    .setPayload(null);
         }
     }
 

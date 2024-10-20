@@ -1,4 +1,4 @@
-package com.kkimleang.commoncore.util;
+package com.kkimleang.authservice.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -1,7 +1,6 @@
-package com.kkimleang.authservice.dto;
+package com.kkimleang.authservice.dto.auth;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ import java.time.Instant;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class AuthResponse implements Serializable {
+public class AuthDto implements Serializable {
     private final String accessToken;
     private final String refreshToken;
     private String tokenType = "Bearer";

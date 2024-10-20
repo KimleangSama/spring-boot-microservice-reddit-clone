@@ -1,15 +1,11 @@
-package com.kkimleang.authservice.config.security;
+package com.kkimleang.authservice.util;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
 
 import com.kkimleang.authservice.config.properties.TokenProperties;
-import com.kkimleang.authservice.model.Permission;
 import com.kkimleang.authservice.model.User;
 import com.kkimleang.authservice.service.user.CustomUserDetails;
-import com.kkimleang.authservice.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -70,19 +66,15 @@ public class TokenProvider {
         return jwt.getClaim(JwtUtils.EMAIL.getProperty());
     }
 
-    public boolean validateToken(String authToken) {
-        if (authToken == null) {
-            return false;
-        }
-        return isTokenExpired(authToken);
-    }
-
-    public boolean isTokenValid(String token, User userDetails) {
+    public boolean isTokenValid(String token, User user) {
         final String username = getUserEmailFromToken(token);
-        return (username.equals(userDetails.getEmail())) && isTokenExpired(token);
+        return (username.equals(user.getEmail())) && isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
+        if (token == null) {
+            return true;
+        }
         Instant exp = jwtDecoder.decode(token).getExpiresAt();
         if (exp != null) {
             return !exp.isBefore(Instant.now());

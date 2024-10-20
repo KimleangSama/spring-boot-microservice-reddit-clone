@@ -7,7 +7,7 @@ import java.util.stream.Stream;
 
 import com.kkimleang.authservice.config.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.kkimleang.authservice.config.properties.OAuthProperties;
-import com.kkimleang.authservice.config.security.TokenProvider;
+import com.kkimleang.authservice.util.TokenProvider;
 import com.kkimleang.authservice.exception.BadRequestException;
 import com.kkimleang.authservice.exception.ResourceNotFoundException;
 import com.kkimleang.authservice.model.Token;
